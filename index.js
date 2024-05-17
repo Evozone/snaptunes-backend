@@ -23,11 +23,33 @@ app.post('/api/recommend-songs', async (req, res) => {
     try {
         const imageParts = req.body.imageParts;
         const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
-        const prompt = `You are a highly acclaimed video-editor person, who is aware about the latest and legacy songs which go perfect with a respective image or video shot. Now can u please use your years of experience and suggest some songs for the given image input. Try to think what the image is about, like is it a festival or event or something else, and based on that suggest songs. Those songs should be from Bollywood or Hollywood. The output should be strictly in string format and it should be an object of length 2 where in the first element should be an array of 4 Bollywood Songs and 2nd element should be another array of 4 Hollywood songs. The song name should be followed by artist name as well. Example - "{"Bollywood": ["Rang Barse Silsila by Amitabh Bachchan","Holi Ke Din by Kishore Kumar, Lata Mangeshkar, and R. D. Burman","Balam Pichkari by  Shalmali Kholgade, Vishal Dadlani, Pritam Chakraborty, Amitabh Bhattacharya","Soniyo by Raju Singh, Shreya Ghoshal, and Sonu Nigam"],"Hollywood": ["Happy by Pharrell Williams","Dont Stop Me Now by Queen","Celebration by Pat Boone","I Gotta Feeling by  Black Eyed Peas"]}" . Important Note is do not include any indentation markers like json or do not decorate it with backticks. The output should strictly follow the format of the given example. Thankyou!`;
+        const prompt = `Please generate a JSON object containing a list of songs for the given image input. Assume that you are a highly experienced software engineer and video editor who has knowledge of both Bollywood and Hollywood songs suitable for various occasions or themes depicted in images or videos.
+
+        The output should be in the following JSON format:
+             
+        {
+          "Bollywood": ["Song 1 by Artist 1", "Song 2 by Artist 2", "Song 3 by Artist 3", "Song 4 by Artist 4"],
+          "Hollywood": ["Song 1 by Artist 1", "Song 2 by Artist 2", "Song 3 by Artist 3", "Song 4 by Artist 4"]
+        }
+        
+        Please ensure the following:
+        
+            The output is a valid JSON object.
+            The object contains two arrays: one for Bollywood songs and one for Hollywood songs.
+            Each song entry follows the format 'Song Name by Artist Name'.
+            There are exactly four songs in each array.
+            Use double quotation marks (") for each song and artist name.
+            If there are any special characters within a song name, make sure to escape them properly.
+        
+        Feel free to consider the theme or context of the given image when suggesting songs. Thank you!`;
+
         const result = await model.generateContent([prompt, ...imageParts]);
         const response = result.response;
-        const text = response.text();
-        console.log(text);
+        var text = response.text();
+        if (text.includes('```json')) {
+            text = text.replace('```json', '');
+            text = text.replace('```', '');
+        }
         res.send(text);
     } catch (error) {
         // send error in response
