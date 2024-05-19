@@ -50,6 +50,13 @@ app.post('/api/recommend-songs', async (req, res) => {
             text = text.replace('```json', '');
             text = text.replace('```', '');
         }
+        // Write a regular expression to extract the JSON object from the response
+        const jsonRegex = /{[^]*}/;
+        const match = text.match(jsonRegex);
+        if (!match) {
+            throw new Error('Failed to extract JSON object from response');
+        }
+        text = match[0];
         res.send(text);
     } catch (error) {
         // send error in response
