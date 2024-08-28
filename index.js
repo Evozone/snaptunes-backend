@@ -22,7 +22,7 @@ app.get('/api/', (req, res) => {
 app.post('/api/recommend-songs', async (req, res) => {
     try {
         const imageParts = req.body.imageParts;
-        const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
         const prompt = `Please generate a JSON object containing a list of songs for the given image input. Assume that you are a highly experienced software engineer and video editor who has knowledge of both Bollywood and Hollywood songs suitable for various occasions or themes depicted in images or videos.
 
         The output should be in the following JSON format:
@@ -60,6 +60,8 @@ app.post('/api/recommend-songs', async (req, res) => {
         res.send(text);
     } catch (error) {
         // send error in response
+        console.log(error);
+        console.log(error.message);
         res.status(500).send(error.message);
     }
 });
